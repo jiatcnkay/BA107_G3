@@ -30,8 +30,9 @@ public class MemberVO implements Serializable {
 	private String memProhibit;
 	private String memSetNotify;
 	private Date memTimeNotify;
+	private String memAge;
 	
-	MemberVO(){
+	public MemberVO(){
 	}
 
 	public String getMemNo() {
@@ -240,6 +241,14 @@ public class MemberVO implements Serializable {
 
 	public void setMemTimeNotify(Date memTimeNotify) {
 		this.memTimeNotify = memTimeNotify;
+	}
+
+	public String getMemAge() {
+		return memAge;
+	}
+
+	public void setMemAge(String memAge) {
+		this.memAge = memAge;
 	};
 	
 	

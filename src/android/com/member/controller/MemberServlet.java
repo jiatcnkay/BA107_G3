@@ -1,57 +1,93 @@
 package android.com.member.controller;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.lang.reflect.Type;
+import java.util.Base64;
+import java.util.List;
+import java.util.Map;
 
 import javax.servlet.ServletException;
-import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.reflect.TypeToken;
 
-import android.com.member.model.MemberDAO;
+import android.com.main.ImageUtil;
+import android.com.member.model.MemberService;
 import android.com.member.model.MemberVO;
 
 public class MemberServlet extends HttpServlet {
-	private final static String CONTENT_TYPE = "text/html; charset=UTF-8";
-	private JsonObject jsonObject;
-	private MemberDAO memberDAO = new MemberDAO();
-	private MemberVO memberVO;
-	
-	protected void doGet(HttpServletRequest req, HttpServletResponse res) 
-			throws ServletException, IOException {
-		doPost(req,res);
 
-	}
-	
-	protected void doPost(HttpServletRequest req, HttpServletResponse res) 
-			throws ServletException, IOException {
+	private static final long serialVersionUID = 1L;
+	private final static String CONTENT_TYPE = "text/html; charset=UTF-8";
+
+	protected void doPost(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
 		req.setCharacterEncoding("UTF-8");
 		Gson gson = new Gson();
-		BufferedReader br = req.getReader();
-		StringBuilder jsonIn = new StringBuilder();
-		String line = null;
-		while((line = br.readLine())!=null){
-			jsonIn.append(line);
-		}
-		System.out.println(jsonIn);
-		jsonObject = gson.fromJson(jsonIn.toString(), JsonObject.class);
-		String param = jsonObject.get("param").getAsString();
+		MemberService memSvc = new MemberService();
 		String outStr = "";
-		switch(param){
-			case "account":
-				String account = jsonObject.get("account").getAsString();
-				memberVO = memberDAO.memberAccount(account);
-				outStr = gson.toJson(memberVO);
-				break;
+		String action = req.getParameter("action");
+		List<MemberVO> memList;
+		
+		if ("isMember".equals(action)) {
+			String account = req.getParameter("account");
+			String password = req.getParameter("password");
+			outStr = String.valueOf(memSvc.isMember(account, password));
+		} 
+		
+		else if ("getOneByAccount".equals(action)) {
+			String account = req.getParameter("account");
+			MemberVO memberVO = memSvc.getOneByAccount(account);
+			int imageSize = Integer.parseInt(req.getParameter("imageSize"));
+			memberVO.setMemPhoto(ImageUtil.shrink(memberVO.getMemPhoto(), imageSize));
+			outStr = gson.toJson(memberVO);
+		} 
+		
+		else if("getLike".equals(action)){
+			String test = req.getParameter("s");
+			System.out.println(test);
+			String jsonIn = req.getParameter("map");
+			Type mapType = new TypeToken<Map<String , String>>() {
+			}.getType();
+			Map<String , String> map = gson.fromJson(jsonIn.toString(), mapType);
+			System.out.println(map);
+			memList = memSvc.getLike(map);
+			for (int i = 0; i < memList.size(); i++) {
+				MemberVO member = memList.get(i);
+				int imageSize = Integer.parseInt(req.getParameter("imageSize"));
+				member.setMemPhoto(ImageUtil.shrink(member.getMemPhoto(),imageSize));
+				member.setMemAge(member.getMemBirthday().toString());
+				member.setMemBirthday(null);
+			}
+			outStr = gson.toJson(memList);	
 		}
+		
+		else if ("getAllMember".equals(action)) {
+			memList = memSvc.getAll();
+			for (int i = 0; i < memList.size(); i++) {
+				MemberVO member = memList.get(i);
+				//byte[] img = ImageUtil.shrink(member.getMemPhoto(),imageSize);
+				//member.setMemPhoto(Base64.getEncoder().encode(member.getMemPhoto()));
+				int imageSize = Integer.parseInt(req.getParameter("imageSize"));
+				member.setMemPhoto(ImageUtil.shrink(member.getMemPhoto(),imageSize));
+				member.setMemAge(member.getMemBirthday().toString());
+				member.setMemBirthday(null);
+			}
+			outStr = gson.toJson(memList);
+		}
+			
 		res.setContentType(CONTENT_TYPE);
 		PrintWriter out = res.getWriter();
 		System.out.println(outStr);
-		out.println(outStr);
+		out.print(outStr);
+		out.close();
+	}
+
+	protected void doGet(HttpServletRequest req, HttpServletResponse res) throws ServletException, IOException {
+		doPost(req, res);
 	}
 }

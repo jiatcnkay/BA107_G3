@@ -1,11 +1,13 @@
 package android.com.member.model;
 
 import java.util.List;
+import java.util.Map;
 
 public interface MemberDAO_interface {
-	void memberAdd(MemberVO member);
+	Boolean isMember(String account,String password);
 	void memberUpdate(MemberVO member);
-	MemberVO memberSelect(String name);
+	MemberVO getOneByAccount(String account);
+	MemberVO getOneByMemNo(String mem_no);
+	List<MemberVO> getLike(Map<String, String> map);
 	List<MemberVO> getAll();
-	public MemberVO memberAccount(String account);
 }
