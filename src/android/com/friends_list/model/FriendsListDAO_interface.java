@@ -10,5 +10,6 @@ public interface FriendsListDAO_interface {
 	public FriendsListVO findByPrimaryKey(String mem_no_self,String mem_no_other);
 	public List<FriendsListVO> getAll();
 	public List<FriendsListVO> getMemberFriends(String mem_no);
+	public Boolean havewait(String mem_no_self,String mem_no_other);
 	
 }

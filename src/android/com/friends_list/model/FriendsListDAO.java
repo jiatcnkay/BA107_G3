@@ -31,10 +31,12 @@ public class FriendsListDAO implements FriendsListDAO_interface{
 	private static final String INSERT_FRIENDS = "INSERT INTO FRIENDS_LIST (MEM_NO_SELF,MEM_NO_OTHER)VALUES(?,?)";
 	private static final String UPDATE_FRIENDS = "UPDATE FRIENDS_LIST SET MEM_NO_SELF=?,MEM_NO_OTHER=?,FRILIST_MODIFY=?,FRILIST_TIME=?,FRILIST_NOTICE=? WHERE MEM_NO_SELF=? AND MEM_NO_OTHER=?";
 	private static final String DELETE_FRIENDS = "DELETE FROM FRIENDS_LIST WHERE MEM_NO_SELF=? AND MEM_NO_OTHER=?";
-	private static final String GET_ONE_LIST = "SELECT*FROM FRIENDS_LIST WHERE MEM_NO_SELF=? AND MEM_NO_OTHER=?";
+	private static final String GET_ONE_LIST = "SELECT*FROM FRIENDS_LIST WHERE MEM_NO_SELF=?";
 	private static final String GET_ALL = "SELECT*FROM FRIENDS_LIST";
-	private static final String GET_LIST_ByMEMEBERNO = "SELECT*FROM FRIENDS_LIST WHERE (MEM_NO_SELF=? OR MEM_NO_OTHER =?) AND FRILIST_MODIFY NOT IN('待審核')";
-
+	private static final String GET_LIST_ByMEMEBERNO = "SELECT*FROM FRIENDS_LIST WHERE MEM_NO_SELF=? AND FRILIST_MODIFY NOT IN('待審核')";
+	private static final String HAVEWAIT = "SELECT*FROM FRIENDS_LIST WHERE MEM_NO_SELF=? AND MEM_NO_OTHER=? AND FRILIST_MODIFY IN('待審核')";
+	
+	
 	@Override
 	public void insert(FriendsListVO frilistVO) {
 		Connection con = null;
@@ -42,11 +44,12 @@ public class FriendsListDAO implements FriendsListDAO_interface{
 		
 		try{
 			con = ds.getConnection();
-			pstmt = con.prepareStatement(INSERT_FRIENDS);
-			
+			pstmt = con.prepareStatement(INSERT_FRIENDS);	
 			pstmt.setString(1, frilistVO.getMem_no_self());
-			pstmt.setString(2, frilistVO.getMem_no_other());
-			
+			pstmt.setString(2, frilistVO.getMem_no_other());		
+			pstmt.executeUpdate();
+			pstmt.setString(1, frilistVO.getMem_no_other());
+			pstmt.setString(2, frilistVO.getMem_no_self());		
 			pstmt.executeUpdate();
 			System.out.println("新增成功");
 			
@@ -125,7 +128,9 @@ public class FriendsListDAO implements FriendsListDAO_interface{
 			
 			pstmt.setString(1, mem_no_self);
 			pstmt.setString(2, mem_no_other);
-			
+			pstmt.executeUpdate();
+			pstmt.setString(1, mem_no_other);
+			pstmt.setString(2, mem_no_self);
 			pstmt.executeUpdate();
 			System.out.println("刪除成功");
 			
@@ -253,7 +258,6 @@ public class FriendsListDAO implements FriendsListDAO_interface{
 			con = ds.getConnection();
 			pstmt = con.prepareStatement(GET_LIST_ByMEMEBERNO);
 			pstmt.setString(1, mem_no);
-			pstmt.setString(2, mem_no);
 			rs = pstmt.executeQuery();
 			
 			while(rs.next()){
@@ -288,5 +292,48 @@ public class FriendsListDAO implements FriendsListDAO_interface{
 		}
 		return list;
 	}
-
+	
+	@Override
+	public Boolean havewait(String mem_no_self,String mem_no_other) {
+		Connection con = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs = null;
+		boolean havewait = false;
+		try{
+			con = ds.getConnection();
+			pstmt = con.prepareStatement(HAVEWAIT);
+			
+			pstmt.setString(1, mem_no_self);
+			pstmt.setString(2, mem_no_other);
+			rs = pstmt.executeQuery();
+			havewait = rs.next();
+			
+		}catch(SQLException se){
+			throw new RuntimeException("A database error occured. "
+					+ se.getMessage());
+		}finally{
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if(pstmt!=null){
+				try{
+					pstmt.close();
+				}catch(SQLException se){
+					se.printStackTrace(System.err);
+				}
+			}
+			if(con!=null){
+				try{
+					con.close();
+				}catch(SQLException se){
+					se.printStackTrace(System.err);
+				}
+			}
+		}
+		return havewait;	
+	}
 }

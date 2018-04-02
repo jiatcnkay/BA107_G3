@@ -30,7 +30,9 @@ public class MemberServlet extends HttpServlet {
 		Gson gson = new Gson();
 		MemberService memSvc = new MemberService();
 		String outStr = "";
+		
 		String action = req.getParameter("action");
+		System.out.println(action);
 		List<MemberVO> memList;
 		
 		if ("isMember".equals(action)) {
@@ -49,8 +51,9 @@ public class MemberServlet extends HttpServlet {
 		
 		else if("getLike".equals(action)){
 			String test = req.getParameter("s");
-			System.out.println(test);
+
 			String jsonIn = req.getParameter("map");
+			System.out.println(jsonIn);
 			Type mapType = new TypeToken<Map<String , String>>() {
 			}.getType();
 			Map<String , String> map = gson.fromJson(jsonIn.toString(), mapType);
@@ -82,7 +85,7 @@ public class MemberServlet extends HttpServlet {
 			
 		res.setContentType(CONTENT_TYPE);
 		PrintWriter out = res.getWriter();
-		System.out.println(outStr);
+		//System.out.println(outStr);
 		out.print(outStr);
 		out.close();
 	}

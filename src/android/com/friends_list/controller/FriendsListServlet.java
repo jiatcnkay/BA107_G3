@@ -3,7 +3,10 @@ package android.com.friends_list.controller;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -33,17 +36,11 @@ public class FriendsListServlet extends HttpServlet {
 		MemberService memSvc = new MemberService();
 		if ("getMemberFriends".equals(action)) {
 			String mem_no = req.getParameter("mem_no");
-			System.out.println("mem_no:"+mem_no);
 			List<FriendsListVO> friendsList = fLSvc.getMemberFriends(mem_no);
 			List<MemberVO> friendsDetailList = new ArrayList<>();
 			MemberVO member = new MemberVO();
 			for (int i = 0; i < friendsList.size(); i++) {
-				System.out.println(friendsList.get(i).getMem_no_self());
-				if (!friendsList.get(i).getMem_no_self().equals(mem_no)){
-					System.out.println("1");
-					member = memSvc.getOneByMemNo(friendsList.get(i).getMem_no_self());
-				}else
-					member = memSvc.getOneByMemNo(friendsList.get(i).getMem_no_other());
+				member = memSvc.getOneByMemNo(friendsList.get(i).getMem_no_other());
 				int imageSize = Integer.parseInt(req.getParameter("imageSize"));
 				member.setMemPhoto(ImageUtil.shrink(member.getMemPhoto(), imageSize));
 				member.setMemAge(member.getMemBirthday().toString());
@@ -52,10 +49,28 @@ public class FriendsListServlet extends HttpServlet {
 			}
 			outStr = gson.toJson(friendsDetailList);
 		}
+		
+		else if("insertFriend".equals(action)){
+			String mem_no_self = req.getParameter("mem_no_self");
+			String mem_no_other = req.getParameter("mem_no_other");
+			fLSvc.insert(mem_no_self, mem_no_other);
+		}
+		
+		else if("havewait".equals(action)){
+			String mem_no_self = req.getParameter("mem_no_self");
+			String mem_no_other = req.getParameter("mem_no_other");
+			outStr = String.valueOf(fLSvc.havewait(mem_no_self, mem_no_other));
+		}
+		
+		else if("deleteFriend".equals(action)){
+			String mem_no_self = req.getParameter("mem_no_self");
+			String mem_no_other = req.getParameter("mem_no_other");
+			fLSvc.delete(mem_no_self, mem_no_other);
+		}
 
 		res.setContentType(CONTENT_TYPE);
 		PrintWriter out = res.getWriter();
-		//System.out.println(outStr);
+		System.out.println(outStr);
 		out.print(outStr);
 		out.close();
 	}

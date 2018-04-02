@@ -19,14 +19,18 @@ public class SqlUtil {
 			switch(value){
 				case "20럼쩑짾":
 					aCondition = columnName + " >to_date('"+(year-20)+"/01/01','yyyy/mm/dd' )";
+					break;
 				case "20╁30럼":
 					aCondition = columnName + " between to_date('"+(year-30)+"/01/01','yyyy/mm/dd' ) and"
-							+ "to_char('"+(year-20)+"'/01/01','yyyy/mm/dd' )";
+							+ " to_date('"+(year-20)+"/01/01','yyyy/mm/dd' )";
+					break;
 				case "30╁40럼":
 					aCondition = columnName + " between to_date('"+(year-40)+"/01/01','yyyy/mm/dd' ) and"
-							+ "to_char('"+(year-30)+"'/01/01','yyyy/mm/dd' )";
+							+ " to_date('"+(year-30)+"/01/01','yyyy/mm/dd' )";
+					break;
 				case "40럼쩑쨁":
 					aCondition = columnName + " <to_date('"+(year-40)+"/01/01','yyyy/mm/dd' )";
+					break;
 			}
 		}                         
 		return aCondition + " ";
