@@ -9,7 +9,6 @@ import javax.sql.DataSource;
 
 import android.com.giftLabelDetail.model.GiftLabelDetailService;
 import android.com.giftLabelDetail.model.GiftLabelDetailVO;
-
 public class GiftDAO implements GiftDAO_interface{
 
 	private static DataSource ds = null;
