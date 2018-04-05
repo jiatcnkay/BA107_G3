@@ -1,10 +1,14 @@
 package android.com.giftDiscount.model;
 import java.sql.*;
+import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.Date;
 
 import javax.management.RuntimeErrorException;
 import javax.naming.*;
 import javax.sql.DataSource;
+
+import android.com.gift.model.GiftVO;
 
 public class GiftDiscountDAO implements GiftDiscountDAO_interface{
 	
@@ -22,7 +26,11 @@ public class GiftDiscountDAO implements GiftDiscountDAO_interface{
 	private static final String UPDATE_STMT = "UPDATE GIFT_DISCOUNT SET GIFT_NO=?,GIFTD_START=?,GIFTD_END=?,GIFTD_PERCENT=?,GIFTD_AMOUNT=? WHERE GIFTD_NO=?";
 	private static final String DELETE_STMT = "DELETE FROM GIFT_DISCOUNT WHERE GIFTD_NO=?";
 	private static final String FIND_BY_PK_STMT = "SELECT * FROM GIFT_DISCOUNT WHERE GIFTD_NO=?";
-	private static final String GET_ALL_STMT 	= "SELECT * FROM GIFT_DISCOUNT ORDER BY GIFTD_NO DESC";
+	private static final String GET_ALL_STMT 	= "SELECT * FROM GIFT_DISCOUNT ORDER BY GIFTD_NO ";
+	private static final String GET_ALL = "SELECT GD.GIFTD_NO,GD.GIFT_NO,GD.GIFTD_END,GD.GIFTD_PERCENT,GD.GIFTD_AMOUNT FROM GIFT_DISCOUNT GD JOIN GIFT G ON G.GIFT_NO = GD.GIFT_NO WHERE G.GIFT_IS_ON LIKE '%上架中%' ORDER BY GIFTD_NO DESC";
+	private static final String GET_ALL2 = "SELECT GD.GIFTD_NO,GD.GIFT_NO,GD.GIFTD_END,GD.GIFTD_PERCENT,GD.GIFTD_AMOUNT FROM GIFT_DISCOUNT GD "
+			+ "JOIN GIFT G ON G.GIFT_NO = GD.GIFT_NO WHERE G.GIFT_IS_ON LIKE '%上架中%' "
+			+ "AND GD.GIFTD_END > TO_DATE(?,'YYYY/MM/DD HH24:MI:SS') ORDER BY GIFTD_NO DESC";
 	
 	@Override
 	public void insert(GiftDiscountVO giftDiscountVO) {
@@ -183,18 +191,23 @@ public class GiftDiscountDAO implements GiftDiscountDAO_interface{
 		
 		try {
 			con = ds.getConnection();
-			pstmt = con.prepareStatement(GET_ALL_STMT);
+			pstmt = con.prepareStatement(GET_ALL2);
+			SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
+			Date date = new Date();
+			String strDate = sdFormat.format(date);
+			System.out.println(strDate);
+			pstmt.setString(1, strDate);
 			rs = pstmt.executeQuery();
 			
 			while(rs.next()){
 				giftDiscountVO = new GiftDiscountVO();
 				giftDiscountVO.setGiftd_no(rs.getString("giftd_no"));
 				giftDiscountVO.setGift_no(rs.getString("gift_no"));
-				giftDiscountVO.setGiftd_start(rs.getTimestamp("giftd_start"));
 				giftDiscountVO.setGiftd_end(rs.getTimestamp("giftd_end"));
 				giftDiscountVO.setGiftd_percent(rs.getDouble("giftd_percent"));
 				giftDiscountVO.setGiftd_amount(rs.getInt("giftd_amount"));
 				list.add(giftDiscountVO);
+				System.out.println("1");
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException("A database error occured. " + e.getMessage());
@@ -233,6 +246,5 @@ public class GiftDiscountDAO implements GiftDiscountDAO_interface{
 			System.out.println(g.getGiftd_end());
 		}	
 	}
-
 	
 }

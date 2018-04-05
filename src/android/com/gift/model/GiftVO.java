@@ -1,5 +1,8 @@
 package android.com.gift.model;
 import java.io.Serializable;
+import java.util.List;
+
+import android.com.giftLabel.model.GiftLabelVO;
 
 @SuppressWarnings("serial")
 public class GiftVO implements Serializable {
@@ -11,6 +14,16 @@ public class GiftVO implements Serializable {
 	private String gift_is_on;
 	private Integer gift_track_qty;
 	private Integer gift_buy_qty;
+	private List<String> giftl_name;
+
+
+	public List<String> getGiftl_name() {
+		return giftl_name;
+	}
+
+	public void setGiftl_name(List<String> giftl_name) {
+		this.giftl_name = giftl_name;
+	}
 
 	public GiftVO() {
 		super();

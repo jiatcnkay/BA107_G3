@@ -59,9 +59,9 @@ public class MemberServlet extends HttpServlet {
 			Map<String , String> map = gson.fromJson(jsonIn.toString(), mapType);
 			System.out.println(map);
 			memList = memSvc.getLike(map);
+			int imageSize = Integer.parseInt(req.getParameter("imageSize"));
 			for (int i = 0; i < memList.size(); i++) {
 				MemberVO member = memList.get(i);
-				int imageSize = Integer.parseInt(req.getParameter("imageSize"));
 				member.setMemPhoto(ImageUtil.shrink(member.getMemPhoto(),imageSize));
 				member.setMemAge(member.getMemBirthday().toString());
 				member.setMemBirthday(null);
