@@ -25,7 +25,7 @@ public class GiftLabelDetailDAO implements GiftLabelDetailDAO_interface{
 	private static final String INSERT_STMT = "INSERT INTO GIFT_LABEL_DETAIL VALUES(?,?)";
 	private static final String DELETE_STMT = "DELETE FROM GIFT_LABEL_DETAIL WHERE GIFT_NO=? AND GIFTL_NO=?";
 	private static final String GET_BY_GIFTNO_STMT    = "SELECT * FROM GIFT_LABEL_DETAIL WHERE GIFT_NO =? ORDER BY GIFTL_NO";
-	private static final String GET_BY_GIFTLABELNO_STMT = "SELECT * FROM GIFT_LABEL_DETAIL WHERE GIFTL_NO=? ORDER BY GIFT_NO DESC";
+	private static final String GET_BY_GIFTLABELNO_STMT = "SELECT * FROM GIFT_LABEL_DETAIL WHERE GIFTL_NO=? ORDER BY GIFT_NO";
 	
 	@Override
 	public void insert(GiftLabelDetailVO giftLabelDetailVO, Connection con) {

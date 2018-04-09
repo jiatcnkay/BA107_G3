@@ -47,25 +47,13 @@ public class GiftService {
 	}
 
 	public List<GiftVO> getAll() {
-		// List<String> labelList = null;
-		// GiftLabelVO giftLabelVO = null;
-		// List<GiftLabelDetailVO> detailList = null;
 		List<GiftVO> list = dao.getAll();
-		 for(GiftVO giftVO: list){
-		 giftVO.setGift_pic(ImageUtil.shrink(giftVO.getGift_pic(), 180));
-		 }
-		// detailList = detailDao.getByGiftNo(giftVO.getGift_no());
-		// System.out.println(giftVO.getGift_name());
-		// labelList = new ArrayList<>();
-		// for(GiftLabelDetailVO detailVO: detailList){
-		// giftLabelVO = labelDao.getByPrimaryKey(detailVO.getGiftl_no());
-		// System.out.println(giftLabelVO.getGiftl_name());
-		// labelList.add(giftLabelVO.getGiftl_name());
-		// }
-		// giftVO.setGiftl_name(labelList);
-		// }
+		for (GiftVO giftVO : list) {
+			giftVO.setGift_pic(ImageUtil.shrink(giftVO.getGift_pic(), 180));
+		}
 		return list;
 	}
+
 
 	public Set<String> getByKeyWord(String keyword) {
 		return dao.getByKeyWord(keyword);

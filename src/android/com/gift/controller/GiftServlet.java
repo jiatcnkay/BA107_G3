@@ -34,6 +34,7 @@ public class GiftServlet extends HttpServlet {
 		String outStr = "";
 		GiftService gSvc = new GiftService();
 		List<GiftVO> list = new ArrayList<>();
+		List<List<GiftLabelVO>> getLabel = new ArrayList<>();
 		String action = req.getParameter("action");
 		System.out.println(action);
 
@@ -57,7 +58,7 @@ public class GiftServlet extends HttpServlet {
 			}
 			outStr = gson.toJson(list);
 		}
-
+		
 		res.setContentType(CONTENT_TYPE);
 		PrintWriter out = res.getWriter();
 		//System.out.println(outStr);

@@ -36,7 +36,6 @@ public class GiftDiscountServlet extends HttpServlet {
 
 		if ("getAll".equals(action)) {
 			giftDlist = gdSvc.getAll();
-			System.out.println(giftDlist);
 			outStr = gson.toJson(giftDlist);
 		}
 
