@@ -21,14 +21,6 @@ public class GiftOrderDetailVO implements Serializable {
 		return giftod_no;
 	}
 
-	public String getGiftd_no() {
-		return giftd_no;
-	}
-
-	public void setGiftd_no(String giftd_no) {
-		this.giftd_no = giftd_no;
-	}
-
 	public void setGiftod_no(String giftod_no) {
 		this.giftod_no = giftod_no;
 	}
@@ -47,6 +39,22 @@ public class GiftOrderDetailVO implements Serializable {
 
 	public void setGifto_no(String gifto_no) {
 		this.gifto_no = gifto_no;
+	}
+
+	public String getGiftd_no() {
+		return giftd_no;
+	}
+
+	public void setGiftd_no(String giftd_no) {
+		this.giftd_no = giftd_no;
+	}
+
+	public Integer getGiftod_unit() {
+		return giftod_unit;
+	}
+
+	public void setGiftod_unit(Integer giftod_unit) {
+		this.giftod_unit = giftod_unit;
 	}
 
 	public Integer getGiftod_amount() {
@@ -73,13 +81,6 @@ public class GiftOrderDetailVO implements Serializable {
 		this.giftod_inventory = giftod_inventory;
 	}
 
-	public Integer getGiftod_unit() {
-		return giftod_unit;
-	}
-
-	public void setGiftod_unit(Integer giftod_unit) {
-		this.giftod_unit = giftod_unit;
-	}
-
+	
 }
 

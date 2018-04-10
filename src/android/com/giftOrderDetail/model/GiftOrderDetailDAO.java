@@ -23,7 +23,7 @@ public class GiftOrderDetailDAO implements GiftOrderDetailDAO_interface {
 			pstmt = con.prepareStatement(INSERT_STMT, cols);
 			pstmt.setString(1, giftOrderDetailVO.getGift_no());
 			pstmt.setString(2, giftOrderDetailVO.getGifto_no());
-			pstmt.setString(3, giftOrderDetailVO.getGiftod_no());
+			pstmt.setString(3, giftOrderDetailVO.getGiftd_no());
 			pstmt.setInt(4, giftOrderDetailVO.getGiftod_unit());
 			pstmt.setInt(5, giftOrderDetailVO.getGiftod_amount());
 			pstmt.setInt(6, giftOrderDetailVO.getGiftod_money());

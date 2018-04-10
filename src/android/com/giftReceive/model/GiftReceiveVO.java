@@ -15,10 +15,25 @@ public class GiftReceiveVO implements Serializable {
 	String giftr_is_open;// 收贈禮是否公開
 	String giftr_notice;// 收贈禮通知
 	String giftr_message;// 收贈禮留言
+	String gift_no;//禮物編號
 
 	public GiftReceiveVO() {
 		super();
 	}
+	
+	
+
+	public String getGift_no() {
+		return gift_no;
+	}
+
+
+
+	public void setGift_no(String gift_no) {
+		this.gift_no = gift_no;
+	}
+
+
 
 	public String getGiftr_no() {
 		return giftr_no;

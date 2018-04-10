@@ -195,7 +195,7 @@ public class GiftDiscountDAO implements GiftDiscountDAO_interface{
 			SimpleDateFormat sdFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 			Date date = new Date();
 			String strDate = sdFormat.format(date);
-			System.out.println(strDate);
+			//System.out.println(strDate);
 			pstmt.setString(1, strDate);
 			rs = pstmt.executeQuery();
 			
@@ -207,7 +207,6 @@ public class GiftDiscountDAO implements GiftDiscountDAO_interface{
 				giftDiscountVO.setGiftd_percent(rs.getDouble("giftd_percent"));
 				giftDiscountVO.setGiftd_amount(rs.getInt("giftd_amount"));
 				list.add(giftDiscountVO);
-				System.out.println("1");
 			}
 		} catch (SQLException e) {
 			throw new RuntimeException("A database error occured. " + e.getMessage());
