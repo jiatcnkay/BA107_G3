@@ -1,5 +1,6 @@
 package android.com.member.model;
 
+import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
 
@@ -33,5 +34,17 @@ public class MemberService {
 	
 	public List<MemberVO> getAll() {
 		return dao.getAll();
+	}
+	
+	public List<MemberVO> getPopular() {
+		return dao.getPopular();
+	}
+	
+	public void updateDeposit(String mem_no, Integer delDeposit, Connection con){
+		dao.updateDeposit(mem_no, delDeposit, con);
+	}
+	
+	public void updateRecGift(String mem_no, Integer addRecGift, Connection con) {
+		dao.updateRecGift(mem_no, addRecGift, con);
 	}
 }

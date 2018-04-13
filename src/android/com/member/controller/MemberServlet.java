@@ -46,12 +46,13 @@ public class MemberServlet extends HttpServlet {
 			MemberVO memberVO = memSvc.getOneByAccount(account);
 			int imageSize = Integer.parseInt(req.getParameter("imageSize"));
 			memberVO.setMemPhoto(ImageUtil.shrink(memberVO.getMemPhoto(), imageSize));
+			memberVO.setMemAge(memberVO.getMemBirthday().toString());
+			memberVO.setMemBirthday(null);
 			outStr = gson.toJson(memberVO);
 		} 
 		
 		else if("getLike".equals(action)){
 			String test = req.getParameter("s");
-
 			String jsonIn = req.getParameter("map");
 			System.out.println(jsonIn);
 			Type mapType = new TypeToken<Map<String , String>>() {
@@ -73,8 +74,18 @@ public class MemberServlet extends HttpServlet {
 			memList = memSvc.getAll();
 			for (int i = 0; i < memList.size(); i++) {
 				MemberVO member = memList.get(i);
-				//byte[] img = ImageUtil.shrink(member.getMemPhoto(),imageSize);
-				//member.setMemPhoto(Base64.getEncoder().encode(member.getMemPhoto()));
+				int imageSize = Integer.parseInt(req.getParameter("imageSize"));
+				member.setMemPhoto(ImageUtil.shrink(member.getMemPhoto(),imageSize));
+				member.setMemAge(member.getMemBirthday().toString());
+				member.setMemBirthday(null);
+			}
+			outStr = gson.toJson(memList);
+		}
+		
+		else if("getPopular".equals(action)){
+			memList = memSvc.getPopular();
+			for (int i = 0; i < memList.size(); i++) {
+				MemberVO member = memList.get(i);
 				int imageSize = Integer.parseInt(req.getParameter("imageSize"));
 				member.setMemPhoto(ImageUtil.shrink(member.getMemPhoto(),imageSize));
 				member.setMemAge(member.getMemBirthday().toString());

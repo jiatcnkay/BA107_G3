@@ -1,5 +1,6 @@
 package android.com.giftDiscount.model;
 
+import java.sql.Connection;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,6 +22,10 @@ public class GiftDiscountService {
 	
 	public void updateGiftDiscount(GiftDiscountVO giftDiscountVO){
 		dao.update(giftDiscountVO);
+	}
+	
+	public void updateAmount(String giftd_no, Integer buyAmount, Connection con){
+		dao.updateAmount(giftd_no, buyAmount, con);
 	}
 	
 	public void deleteGiftDiscount(String giftd_no){

@@ -46,7 +46,8 @@ public class GiftOrderServlet extends HttpServlet {
 			}.getType());
 			for (int i = 0; i < giftDlist.size(); i++) {
 				for (int j = 0; j < goDetailList.size(); j++) {
-					if (giftDlist.get(i).getGift_no().equals(goDetailList.get(j).getGift_no()) && goDetailList.get(j).getGiftd_no()!=null) {
+					if (giftDlist.get(i).getGift_no().equals(goDetailList.get(j).getGift_no())
+							&& goDetailList.get(j).getGiftd_no() != null) {
 						if (giftDlist.get(i).getGiftd_amount() < goDetailList.get(j).getGiftod_amount()) {
 							outStr = gson.toJson(giftDlist);
 							break;
@@ -72,14 +73,19 @@ public class GiftOrderServlet extends HttpServlet {
 				}
 				String jsonGiftOrderVO = req.getParameter("jsonGiftOrderVO");
 				GiftOrderVO giftOrderVO = new Gson().fromJson(jsonGiftOrderVO.toString(), GiftOrderVO.class);
-				goSvc.insert(giftOrderVO, orderMap);
-				
+				try {
+					goSvc.insert(giftOrderVO, orderMap);
+					outStr = "結帳成功";
+				} catch (Exception e) {
+					System.out.println(e.getStackTrace());
+					outStr = "金額不足";
+				}
 			}
-			
 		}
 
 		res.setContentType(CONTENT_TYPE);
 		PrintWriter out = res.getWriter();
+		System.out.println(outStr);
 		out.print(outStr);
 		out.close();
 	}

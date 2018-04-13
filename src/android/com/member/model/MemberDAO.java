@@ -7,12 +7,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.TreeMap;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.sql.DataSource;
+
+import android.com.member.model.MemberVO;
 
 import android.com.main.SqlUtil;
 
@@ -40,6 +41,12 @@ public class MemberDAO implements MemberDAO_interface {
 	static final String ISMEMBER = "SELECT * FROM MEMBER WHERE MEM_ACCOUNT = ? AND MEM_PASSWORD = ?";
 
 	static final String GETALL = "SELECT * FROM MEMBER";
+	
+	static final String UPDATE_DEPOSIT_STMT  = "UPDATE MEMBER SET MEM_DEPOSIT=? WHERE MEM_NO=? ";
+	
+	static final String UPDATE_REC_GIFT_STMT = "UPDATE MEMBER SET MEM_RECEIVE_GIFT=? WHERE MEM_NO=? ";
+	
+	static final String GETPOPULAR = "SELECT * FROM (SELECT * FROM MEMBER ORDER BY MEM_RECEIVE_GIFT DESC) WHERE ROWNUM <=3";
 	
 	static String finalSQL;
 
@@ -143,16 +150,13 @@ public class MemberDAO implements MemberDAO_interface {
 			rs.next();
 			mvos = new MemberVO();
 			mvos.setMemNo(rs.getString("MEM_NO"));
-			mvos.setMemAccount(rs.getString("MEM_ACCOUNT"));
-			mvos.setMemPassword(rs.getString("MEM_PASSWORD"));
 			mvos.setMemName(rs.getString("MEM_NAME"));
+			mvos.setMemAccount(rs.getString("MEM_ACCOUNT"));
 			mvos.setMemGender(rs.getString("MEM_GENDER"));
-		//	mvos.setMemBirthday(rs.getDate("MEM_BIRTHDAY"));
+			mvos.setMemBirthday(rs.getDate("MEM_BIRTHDAY"));
 			mvos.setMemCounty(rs.getString("MEM_COUNTY"));
-			mvos.setMemDeposit(rs.getInt("MEM_DEPOSIT"));
 			mvos.setMemContact(rs.getString("MEM_CONTACT"));
 			mvos.setMemEmotion(rs.getString("MEM_EMOTION"));
-			mvos.setMemBonus(rs.getInt("MEM_BONUS"));
 			mvos.setMemBloodType(rs.getString("MEM_BLOODTYPE"));
 			mvos.setMemHeight(rs.getInt("MEM_HEIGHT"));
 			mvos.setMemWeight(rs.getInt("MEM_WEIGHT"));
@@ -161,12 +165,10 @@ public class MemberDAO implements MemberDAO_interface {
 			mvos.setMemOnline(rs.getString("MEM_ONLINE"));
 			mvos.setMemLongitude(rs.getDouble("MEM_LONGITUDE"));
 			mvos.setMemLatitude(rs.getDouble("MEM_LATITUDE"));
-			mvos.setMemPhone(rs.getString("MEM_PHONE"));
-			mvos.setMemMail(rs.getString("MEM_MAIL"));
 			mvos.setMemPhoto(rs.getBytes("MEM_PHOTO"));
 			mvos.setMemProhibit(rs.getString("MEM_PROHIBIT"));
-			mvos.setMemProhibit(rs.getString("MEM_SETNOTIFY"));
-	//		mvos.setMemTimeNotify(rs.getDate("MEM_TIMENOTIFY"));
+			mvos.setMemDeposit(rs.getInt("MEM_DEPOSIT"));
+			mvos.setMemReceiveGift(rs.getInt("MEM_RECEIVE_GIFT"));
 
 		} catch (
 
@@ -232,6 +234,8 @@ public class MemberDAO implements MemberDAO_interface {
 			mvos.setMemLatitude(rs.getDouble("MEM_LATITUDE"));
 			mvos.setMemPhoto(rs.getBytes("MEM_PHOTO"));
 			mvos.setMemProhibit(rs.getString("MEM_PROHIBIT"));
+			mvos.setMemDeposit(rs.getInt("MEM_DEPOSIT"));
+			mvos.setMemReceiveGift(rs.getInt("MEM_RECEIVE_GIFT"));
 
 		} catch (
 
@@ -297,6 +301,8 @@ public class MemberDAO implements MemberDAO_interface {
 				mvos.setMemLatitude(rs.getDouble("MEM_LATITUDE"));
 				mvos.setMemPhoto(rs.getBytes("MEM_PHOTO"));
 				mvos.setMemProhibit(rs.getString("MEM_PROHIBIT"));
+				mvos.setMemDeposit(rs.getInt("MEM_DEPOSIT"));
+				mvos.setMemReceiveGift(rs.getInt("MEM_RECEIVE_GIFT"));
 				memberList.add(mvos);
 			}
 		} catch (SQLException se) {
@@ -359,6 +365,8 @@ public class MemberDAO implements MemberDAO_interface {
 				mvos.setMemLatitude(rs.getDouble("MEM_LATITUDE"));
 				mvos.setMemPhoto(rs.getBytes("MEM_PHOTO"));
 				mvos.setMemProhibit(rs.getString("MEM_PROHIBIT"));
+				mvos.setMemDeposit(rs.getInt("MEM_DEPOSIT"));
+				mvos.setMemReceiveGift(rs.getInt("MEM_RECEIVE_GIFT"));
 				memberList.add(mvos);
 			}
 		} catch (SQLException se) {
@@ -390,5 +398,138 @@ public class MemberDAO implements MemberDAO_interface {
 		return memberList;
 	}
 	
+	@Override
+	public void updateDeposit(String mem_no, Integer delDeposit, Connection con) {
+		/* con從GiftOrderDAO的insert()傳遞過來  */
+		PreparedStatement pstmt = null;
+		MemberVO memberVO = getOneByMemNo(mem_no);
+		Integer oriDeposit = memberVO.getMemDeposit();
+		try {
+			if(oriDeposit-delDeposit<0)
+				throw new SQLException();
+			pstmt = con.prepareStatement(UPDATE_DEPOSIT_STMT);
+			pstmt.setInt(1, oriDeposit-delDeposit);
+			pstmt.setString(2, mem_no);
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			if(con != null){
+				try {
+					System.err.print("Transaction is being ");
+					System.err.println("rolled back-由-MemberDAO updateDeposit時");
+					con.rollback();
+				} catch (SQLException excep) {
+					throw new RuntimeException("rollback error occured." + excep.getMessage());
+				}
+			}
+			throw new RuntimeException("A database error occured. " + e.getMessage());
+		} finally {
+			if(pstmt != null){
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace(System.err);
+				}
+			}
+		}
+	}
 
+	@Override
+	public void updateRecGift(String mem_no, Integer addRecGift, Connection con) {
+		/* con從GiftOrderDAO的insert()傳遞過來  */
+		PreparedStatement pstmt = null;
+		System.out.println(mem_no);
+		MemberVO memberVO = getOneByMemNo(mem_no);
+		Integer oriRecGift = memberVO.getMemReceiveGift();
+		System.out.println(oriRecGift);
+		System.out.println(addRecGift);
+		try {
+			pstmt = con.prepareStatement(UPDATE_REC_GIFT_STMT);
+			pstmt.setInt(1, oriRecGift+addRecGift);
+			pstmt.setString(2, mem_no);
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			if(con != null){
+				try {
+					System.err.print("Transaction is being ");
+					System.err.println("rolled back-由-GiftReceiveDAO updateDeposit時");
+					con.rollback();
+				} catch (SQLException excep) {
+					throw new RuntimeException("rollback error occured." + excep.getMessage());
+				}
+			}
+			throw new RuntimeException("A database error occured. " + e.getMessage());
+		} finally {
+			if(pstmt != null){
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace(System.err);
+				}
+			}
+		}
+	}
+
+	@Override
+	public List<MemberVO> getPopular() {
+		List<MemberVO> memberList = new ArrayList<MemberVO>();
+		Connection con = null;
+		PreparedStatement ps = null;
+		ResultSet rs = null;
+		MemberVO mvos = null;
+		try {
+			con = ds.getConnection();
+			ps = con.prepareStatement(GETPOPULAR);
+			rs = ps.executeQuery();
+			while (rs.next()) {
+				mvos = new MemberVO();
+				mvos.setMemNo(rs.getString("MEM_NO"));
+				mvos.setMemName(rs.getString("MEM_NAME"));
+				mvos.setMemAccount(rs.getString("MEM_ACCOUNT"));
+				mvos.setMemGender(rs.getString("MEM_GENDER"));
+				mvos.setMemBirthday(rs.getDate("MEM_BIRTHDAY"));
+				mvos.setMemCounty(rs.getString("MEM_COUNTY"));
+				mvos.setMemContact(rs.getString("MEM_CONTACT"));
+				mvos.setMemEmotion(rs.getString("MEM_EMOTION"));
+				mvos.setMemBloodType(rs.getString("MEM_BLOODTYPE"));
+				mvos.setMemHeight(rs.getInt("MEM_HEIGHT"));
+				mvos.setMemWeight(rs.getInt("MEM_WEIGHT"));
+				mvos.setMemInterest(rs.getString("MEM_INTEREST"));
+				mvos.setMemIntro(rs.getString("MEM_INTRO"));
+				mvos.setMemOnline(rs.getString("MEM_ONLINE"));
+				mvos.setMemLongitude(rs.getDouble("MEM_LONGITUDE"));
+				mvos.setMemLatitude(rs.getDouble("MEM_LATITUDE"));
+				mvos.setMemPhoto(rs.getBytes("MEM_PHOTO"));
+				mvos.setMemProhibit(rs.getString("MEM_PROHIBIT"));
+				mvos.setMemDeposit(rs.getInt("MEM_DEPOSIT"));
+				mvos.setMemReceiveGift(rs.getInt("MEM_RECEIVE_GIFT"));
+				memberList.add(mvos);
+			}
+		} catch (SQLException se) {
+			throw new RuntimeException("A database error occured. " + se.getMessage());
+		} finally {
+			if (rs != null) {
+				try {
+					rs.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+			}
+			if (ps != null) {
+				try {
+					ps.close();
+				} catch (SQLException se) {
+					se.printStackTrace(System.err);
+				}
+			}
+			if (con != null) {
+				try {
+					con.setAutoCommit(true);
+					con.close();
+				} catch (Exception e) {
+					e.printStackTrace(System.err);
+				}
+			}
+		}
+		return memberList;
+	}
 }

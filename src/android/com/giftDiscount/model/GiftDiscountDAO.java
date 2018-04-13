@@ -8,6 +8,8 @@ import javax.management.RuntimeErrorException;
 import javax.naming.*;
 import javax.sql.DataSource;
 
+import android.com.giftDiscount.model.GiftDiscountVO;
+
 import android.com.gift.model.GiftVO;
 
 public class GiftDiscountDAO implements GiftDiscountDAO_interface{
@@ -24,6 +26,7 @@ public class GiftDiscountDAO implements GiftDiscountDAO_interface{
 	
 	private static final String INSERT_STMT = "INSERT INTO GIFT_DISCOUNT(GIFTD_NO,GIFT_NO,GIFTD_START,GIFTD_END,GIFTD_PERCENT,GIFTD_AMOUNT) VALUES ('GD'||LPAD(to_char(GIFT_DISCOUNT_SEQ.NEXTVAL),3,'0'),?,?,?,?,?)";
 	private static final String UPDATE_STMT = "UPDATE GIFT_DISCOUNT SET GIFT_NO=?,GIFTD_START=?,GIFTD_END=?,GIFTD_PERCENT=?,GIFTD_AMOUNT=? WHERE GIFTD_NO=?";
+	private static final String UPDATE_AMOUNT_STMT = "UPDATE GIFT_DISCOUNT SET GIFTD_AMOUNT=? WHERE GIFTD_NO=?";
 	private static final String DELETE_STMT = "DELETE FROM GIFT_DISCOUNT WHERE GIFTD_NO=?";
 	private static final String FIND_BY_PK_STMT = "SELECT * FROM GIFT_DISCOUNT WHERE GIFTD_NO=?";
 	private static final String GET_ALL_STMT 	= "SELECT * FROM GIFT_DISCOUNT ORDER BY GIFTD_NO ";
@@ -101,6 +104,40 @@ public class GiftDiscountDAO implements GiftDiscountDAO_interface{
 		}
 	}
 
+	@Override
+	public void updateAmount(String giftd_no, Integer buyAmount, Connection con) {
+		/* con從GiftOrderDetailDAO的insert()傳遞過來  */
+		PreparedStatement pstmt = null;
+		GiftDiscountVO giftDiscountVO = getByPrimaryKey(giftd_no);
+		Integer oriAmount = giftDiscountVO.getGiftd_amount();
+		try {
+			pstmt = con.prepareStatement(UPDATE_AMOUNT_STMT);
+			pstmt.setInt(1, oriAmount-buyAmount);
+			pstmt.setString(2, giftd_no);
+			pstmt.executeUpdate();
+		} catch (SQLException e) {
+			if(con != null){
+				try {
+					System.err.print("Transaction is being ");
+					System.err.println("rolled back-由-GiftDiscountDAO updateAmount時");
+					con.rollback();
+				} catch (SQLException excep) {
+					throw new RuntimeException("rollback error occured." + excep.getMessage());
+				}
+			}
+			throw new RuntimeException("A database error occured. " + e.getMessage());
+		} finally {
+			if(pstmt != null){
+				try {
+					pstmt.close();
+				} catch (SQLException e) {
+					e.printStackTrace(System.err);
+				}
+			}
+		}
+		
+	}
+	
 	@Override
 	public void delete(String giftd_no) {
 		Connection con = null;

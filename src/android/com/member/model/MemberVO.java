@@ -31,7 +31,9 @@ public class MemberVO implements Serializable {
 	private String memSetNotify;
 	private Date memTimeNotify;
 	private String memAge;
+	private Integer memReceiveGift;
 	
+
 	public MemberVO(){
 	}
 
@@ -249,6 +251,14 @@ public class MemberVO implements Serializable {
 
 	public void setMemAge(String memAge) {
 		this.memAge = memAge;
+	}
+
+	public Integer getMemReceiveGift() {
+		return memReceiveGift;
+	}
+
+	public void setMemReceiveGift(Integer memReceiveGift) {
+		this.memReceiveGift = memReceiveGift;
 	};
 	
 	
